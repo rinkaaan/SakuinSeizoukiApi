@@ -3,7 +3,7 @@ WORKSPACE="$WORKPLACE/SakuinSeizoukiApi"
 
 (
   cd "$WORKSPACE"
-  ICON_SRC="$WORKPLACE/SakuinSeizoukiReactApp/public/vite.svg"
+  ICON_SRC="$WORKPLACE/SakuinSeizoukiReactApp/public/icon.png"
 
   rm -rf temp
   rm -rf dist/Icon.iconset
@@ -11,14 +11,14 @@ WORKSPACE="$WORKPLACE/SakuinSeizoukiApi"
 
   mkdir temp
   mkdir -p dist
-  svgexport "$ICON_SRC" temp/icon_16.png 16:16
-  svgexport "$ICON_SRC" temp/icon_32.png 32:32
-  svgexport "$ICON_SRC" temp/icon_64.png 64:64
-  svgexport "$ICON_SRC" temp/icon_128.png 128:128
-  svgexport "$ICON_SRC" temp/icon_256.png 256:256
-  svgexport "$ICON_SRC" temp/icon_512.png 512:512
-  sleep 2
-  svgexport "$ICON_SRC" temp/icon_1024.png 1024:1024
+
+  convert "$ICON_SRC" -resize 16x16 temp/icon_16.png
+  convert "$ICON_SRC" -resize 32x32 temp/icon_32.png
+  convert "$ICON_SRC" -resize 64x64 temp/icon_64.png
+  convert "$ICON_SRC" -resize 128x128 temp/icon_128.png
+  convert "$ICON_SRC" -resize 256x256 temp/icon_256.png
+  convert "$ICON_SRC" -resize 512x512 temp/icon_512.png
+  convert "$ICON_SRC" -resize 1024x1024 temp/icon_1024.png
 
   mkdir dist/Icon.iconset
   cp temp/icon_16.png dist/Icon.iconset/icon_16x16.png
