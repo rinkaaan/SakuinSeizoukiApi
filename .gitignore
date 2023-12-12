@@ -2,4 +2,7 @@
 /scripts/build
 /build
 /dist
+/poc/*.pdf
+/poc/*.txt
+/poc/*.png
 .python-version

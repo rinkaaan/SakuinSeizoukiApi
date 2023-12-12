@@ -2,3 +2,4 @@ apiflask[yaml]
 flask-cors
 pywebview
 pyinstaller
+PyMuPDF
