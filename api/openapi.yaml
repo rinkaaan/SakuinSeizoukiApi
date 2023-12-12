@@ -1,0 +1,29 @@
+info:
+  title: Flask Pywebview Example API
+  version: 0.1.0
+tags:
+- name: Time
+servers:
+- url: http://127.0.0.1:34200/
+paths:
+  /time/:
+    get:
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeOut'
+          description: Successful response
+      tags:
+      - Time
+      summary: Get
+openapi: 3.0.3
+components:
+  schemas:
+    TimeOut:
+      type: object
+      properties:
+        time:
+          type: string
