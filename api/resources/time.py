@@ -3,7 +3,7 @@ import datetime
 from apiflask import Schema, APIBlueprint
 from apiflask.fields import String
 
-time_bp = APIBlueprint("time", __name__, url_prefix="/time")
+time_bp = APIBlueprint("Time", __name__, url_prefix="/time")
 
 
 class TimeOut(Schema):

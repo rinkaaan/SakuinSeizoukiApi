@@ -7,6 +7,7 @@ a = Analysis(
     binaries=[],
     datas=[
         ('static', 'static'),
+        ('api/.env.prod', '.'),
     ],
     hiddenimports=[
         'apiflask.settings'
@@ -25,7 +26,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='Flask Pywebview Example',
+    name='索引製造機',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -41,7 +42,7 @@ exe = EXE(
 )
 app = BUNDLE(
     exe,
-    name='Flask Pywebview Example.app',
+    name='索引製造機.app',
     icon='dist/Icon.icns',
     bundle_identifier='com.rinkaaan.SakuinSeizouki',
 )

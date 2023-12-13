@@ -21,7 +21,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='Flask Pywebview Example',
+    name='索引製造機',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

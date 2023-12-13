@@ -1,11 +1,23 @@
 info:
-  title: Flask Pywebview Example API
+  title: SakuinSeizouki API
   version: 0.1.0
 tags:
 - name: Time
-servers:
-- url: http://127.0.0.1:34200/
+- name: Book Index
+- name: Pdf
 paths:
+  /pdf/:
+    post:
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful response
+      tags:
+      - Pdf
+      summary: Post
   /time/:
     get:
       parameters: []
@@ -19,6 +31,18 @@ paths:
       tags:
       - Time
       summary: Get
+  /book-index/:
+    get:
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful response
+      tags:
+      - Book Index
+      summary: Get
 openapi: 3.0.3
 components:
   schemas:
@@ -27,3 +51,4 @@ components:
       properties:
         time:
           type: string
+
