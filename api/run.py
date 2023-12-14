@@ -5,11 +5,15 @@ import webview
 from flask.cli import load_dotenv
 
 from api.app import flask_app
-from nguylinc_python_utils.pyinstaller import is_pyinstaller, get_path, get_bundle_dir
+from nguylinc_python_utils.misc import rename_substring_in_files
+from nguylinc_python_utils.pyinstaller import is_pyinstaller, get_path, get_bundle_dir, get_free_port
 
 stop_event = Event()
 app_title = "索引製造機"
-port = 34200
+if is_pyinstaller():
+    port = get_free_port()
+else:
+    port = 34200
 
 if is_pyinstaller():
     load_dotenv(get_path(".env.prod"))
@@ -23,7 +27,8 @@ def run_api():
 
 
 if __name__ == '__main__':
-    print("Bundle directory:", get_bundle_dir())
+    bundle_dir = get_bundle_dir()
+    print("Bundle directory:", bundle_dir)
     t = Thread(target=run_api)
     t.start()
 
@@ -35,6 +40,7 @@ if __name__ == '__main__':
     )
 
     if is_pyinstaller():
+        rename_substring_in_files(bundle_dir + "/static", "http://127.0.0.1:34200", f"http://127.0.0.1:{port}", ["js"])
         webview.start(debug=False, http_server=True)
     else:
         webview.start(debug=True, http_server=True)

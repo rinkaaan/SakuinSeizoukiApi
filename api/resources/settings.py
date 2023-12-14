@@ -4,16 +4,14 @@ from fitz import fitz
 
 from nguylinc_python_utils.pyinstaller import get_bundle_dir
 
-pdf_bp = APIBlueprint("Pdf", __name__, url_prefix="/pdf")
+settings_bp = APIBlueprint("Settings", __name__, url_prefix="/settings")
 
 
-@pdf_bp.post("/")
-@pdf_bp.output({})
+@settings_bp.post("/")
+@settings_bp.output({})
 def post():
     window = webview.active_window()
-    file_types = ('PDF Files (*.pdf)',)
-    file_path = window.create_file_dialog(dialog_type=webview.OPEN_DIALOG, directory='/', file_types=file_types)
-
+    file_path = window.create_file_dialog(dialog_type=webview.FOLDER_DIALOG, directory='/')
     if file_path:
         doc = fitz.open(str(file_path[0]))
         page_number = 14

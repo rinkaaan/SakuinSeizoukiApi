@@ -4,3 +4,4 @@ pywebview
 pyinstaller
 PyMuPDF
 python-dotenv
+flask-socketio
