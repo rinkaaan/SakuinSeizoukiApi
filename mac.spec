@@ -10,7 +10,8 @@ a = Analysis(
         ('api/.env.prod', '.'),
     ],
     hiddenimports=[
-        'apiflask.settings'
+        'apiflask.settings',
+        'engineio.async_drivers.threading',
     ],
     hookspath=[],
     hooksconfig={},

@@ -29,7 +29,7 @@ def run_api():
 if __name__ == '__main__':
     bundle_dir = get_bundle_dir()
     print("Bundle directory:", bundle_dir)
-    t = Thread(target=run_api)
+    t = Thread(target=run_api, daemon=True)
     t.start()
 
     window = webview.create_window(
@@ -41,8 +41,8 @@ if __name__ == '__main__':
 
     if is_pyinstaller():
         rename_substring_in_files(bundle_dir + "/static", "http://127.0.0.1:34200", f"http://127.0.0.1:{port}", ["js"])
-        webview.start(debug=False, http_server=True)
+        webview.start(debug=True, http_server=True, private_mode=False)
     else:
-        webview.start(debug=True, http_server=True)
+        webview.start(debug=True, http_server=True, private_mode=False)
 
 stop_event.set()

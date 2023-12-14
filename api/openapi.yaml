@@ -5,6 +5,7 @@ tags:
 - name: Time
 - name: Book Index
 - name: Pdf
+- name: Settings
 paths:
   /pdf/:
     post:
@@ -43,6 +44,18 @@ paths:
       tags:
       - Book Index
       summary: Get
+  /settings/app-data-directory:
+    post:
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful response
+      tags:
+      - Settings
+      summary: Post
 openapi: 3.0.3
 components:
   schemas:
