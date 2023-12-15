@@ -55,13 +55,62 @@ paths:
           description: Successful response
       tags:
       - Settings
-      summary: Post
+      summary: Select App Data Directory
+  /settings/app-data-directory/validate:
+    post:
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppDataDirectoryValidateOut'
+          description: Successful response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: Validation error
+      tags:
+      - Settings
+      summary: Validate App Data Directory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppDataDirectoryValidateIn'
 openapi: 3.0.3
 components:
   schemas:
+    ValidationError:
+      properties:
+        detail:
+          type: object
+          properties:
+            <location>:
+              type: object
+              properties:
+                <field_name>:
+                  type: array
+                  items:
+                    type: string
+        message:
+          type: string
+      type: object
     TimeOut:
       type: object
       properties:
         time:
           type: string
+    AppDataDirectoryValidateIn:
+      type: object
+      properties:
+        app_data_directory:
+          type: string
+    AppDataDirectoryValidateOut:
+      type: object
+      properties:
+        valid:
+          type: boolean
 
