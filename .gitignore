@@ -167,3 +167,4 @@ cython_debug/
 /poc/*.txt
 /poc/*.png
 .python-version
+/api/database.db
