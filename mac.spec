@@ -2,13 +2,10 @@
 
 
 a = Analysis(
-    ['api/run.py'],
+    ['api/app.py'],
     pathex=[],
     binaries=[],
-    datas=[
-        ('static', 'static'),
-        ('api/.env.prod', '.'),
-    ],
+    datas=[],
     hiddenimports=[
         'apiflask.settings',
         'engineio.async_drivers.threading',
@@ -27,7 +24,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='索引製造機',
+    name='engine',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -40,10 +37,4 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-)
-app = BUNDLE(
-    exe,
-    name='索引製造機.app',
-    icon='dist/Icon.icns',
-    bundle_identifier='com.rinkaaan.SakuinSeizouki',
 )

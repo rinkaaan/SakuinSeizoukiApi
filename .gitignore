@@ -163,8 +163,8 @@ cython_debug/
 /scripts/build
 /build
 /dist
-/poc/*.pdf
-/poc/*.txt
+*.pdf
+*.txt
 /poc/*.png
 .python-version
 /api/database.db
