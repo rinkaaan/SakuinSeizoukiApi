@@ -1,9 +1,12 @@
+import os
 import sys
 
 from apiflask import APIFlask
+from flask import send_from_directory
 from flask_cors import CORS
 from flask_socketio import SocketIO
 
+from api.resources.project import project_bp
 from api.resources.settings import settings_bp
 from api.resources.time import time_bp
 from models.base import Base
@@ -19,6 +22,13 @@ CORS(flask_app, supports_credentials=False)
 
 flask_app.register_blueprint(time_bp)
 flask_app.register_blueprint(settings_bp)
+flask_app.register_blueprint(project_bp)
+
+
+@flask_app.route("/temp/<path:path>")
+def send_file(path):
+    return send_from_directory(get_bundle_dir() + "/temp", path)
+
 
 session = SessionManager(Base)
 
@@ -33,9 +43,12 @@ if is_pyinstaller():
 else:
     port = 34200
 
+BASE_URL = "http://127.0.0.1:" + str(port)
+
 if __name__ == "__main__":
     bundle_dir = get_bundle_dir()
     print("Bundle directory:", bundle_dir)
+    os.makedirs(os.path.join(bundle_dir, "temp"), exist_ok=True)
     if is_pyinstaller():
         flask_app.run(port=port, debug=False)
     else:

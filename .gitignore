@@ -168,3 +168,4 @@ cython_debug/
 /poc/*.png
 .python-version
 /api/database.db
+/api/temp
