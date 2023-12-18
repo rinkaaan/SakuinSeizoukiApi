@@ -167,5 +167,5 @@ cython_debug/
 *.txt
 /poc/*.png
 .python-version
-/api/database.db
+/api/sqlite.db
 /api/temp
