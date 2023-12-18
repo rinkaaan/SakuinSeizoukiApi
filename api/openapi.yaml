@@ -130,14 +130,14 @@ components:
           type: integer
         height:
           type: integer
-        sample_urls:
+        page_numbers:
           type: array
           items:
-            type: string
+            type: integer
     OpenPdfOut:
       type: object
       properties:
-        pages:
+        page_types:
           type: array
           items:
             $ref: '#/components/schemas/PdfPageType'

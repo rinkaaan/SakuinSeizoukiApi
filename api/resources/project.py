@@ -1,11 +1,8 @@
-import os
-import uuid
+import json
 
 import fitz
 from apiflask import APIBlueprint, Schema
 from apiflask.fields import String, Integer, List, Nested
-
-from nguylinc_python_utils.pyinstaller import get_bundle_dir
 
 project_bp = APIBlueprint("Project", __name__, url_prefix="/project")
 
@@ -17,48 +14,41 @@ class OpenPdfIn(Schema):
 class PdfPageType(Schema):
     width = Integer()
     height = Integer()
-    sample_urls = List(String())
+    page_numbers = List(Integer())
 
 
 class OpenPdfOut(Schema):
-    pages = List(Nested(PdfPageType))
+    page_types = List(Nested(PdfPageType))
 
 
 @project_bp.post("/new/pdf")
 @project_bp.input(OpenPdfIn, arg_name="params")
 @project_bp.output(OpenPdfOut)
 def open_pdf(params):
-    from api.app import BASE_URL
     doc = fitz.open(params["pdf_path"])
-    page_number = 14
-    test_page = doc.load_page(page_number - 1)
 
-    # x, y = 498, 85
-    # dx, dy = 334, 482
-    # rect = fitz.Rect(x, y, x + dx, y + dy)
-    # chars = test_page.get_textbox(rect)
-    # save_path = get_bundle_dir() + "/test.txt"
-    # with open(save_path, "w") as f:
-    #     for char in chars:
-    #         if ord(char) > 32:
-    #             f.write(char)
+    # Initialize an empty dictionary to store page types and their sample page numbers
+    page_types = {}
 
-    zoom = 2
-    mat = fitz.Matrix(zoom, zoom)
-    pix = test_page.get_pixmap(matrix=mat)
-    filename = uuid.uuid4()
-    save_path = os.path.join(get_bundle_dir(), "temp", f"{filename}.png")
-    pix.save(save_path)
+    # Loop through all pages in the document
+    for page_number, page in enumerate(doc):
+        # Get the current page's width and height; rounded up
+        page_width = int(round(page.mediabox_size[0]))
+        page_height = int(round(page.mediabox_size[1]))
 
-    return {
-        "pages": [
-            {
-                "width": test_page.mediabox_size[0],
-                "height": test_page.mediabox_size[1],
-                "sample_urls": [
-                    f"{BASE_URL}/temp/{filename}.png"
-                ]
+        # Check if the current page size exists in the `page_types` dictionary
+        if (page_width, page_height) not in page_types:
+            # Create a new entry for the current page size
+            page_types[(page_width, page_height)] = {
+                "width": page_width,
+                "height": page_height,
+                "page_numbers": [],
             }
-            # for page_number, page in enumerate(doc)
-        ]
-    }
+
+        # Append the current page number to the sample page numbers for the current page size
+        page_types[(page_width, page_height)]["page_numbers"].append(page_number + 1)
+
+    # Convert the dictionary of page types to a list of page types
+    page_types = list(page_types.values())
+
+    return {"page_types": page_types}
