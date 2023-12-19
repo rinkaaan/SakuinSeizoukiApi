@@ -19,6 +19,19 @@ paths:
       tags:
       - Time
       summary: Get
+  /project/all:
+    get:
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListProjectsOut'
+          description: Successful response
+      tags:
+      - Project
+      summary: List Projects
   /project/new/pdf:
     post:
       parameters: []
@@ -118,6 +131,26 @@ components:
       properties:
         time:
           type: string
+    Project:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        created_at:
+          type: string
+          format: date
+        updated_at:
+          type: string
+          format: date
+    ListProjectsOut:
+      type: object
+      properties:
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/Project'
     OpenPdfIn:
       type: object
       properties:

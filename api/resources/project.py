@@ -2,7 +2,7 @@ import json
 
 import fitz
 from apiflask import APIBlueprint, Schema
-from apiflask.fields import String, Integer, List, Nested
+from apiflask.fields import String, Integer, List, Nested, Date
 
 project_bp = APIBlueprint("Project", __name__, url_prefix="/project")
 
@@ -52,3 +52,20 @@ def open_pdf(params):
     page_types = list(page_types.values())
 
     return {"page_types": page_types}
+
+
+class Project(Schema):
+    id = String()
+    name = String()
+    created_at = Date()
+    updated_at = Date()
+
+
+class ListProjectsOut(Schema):
+    projects = List(Nested(Project))
+
+
+@project_bp.get("/all")
+@project_bp.output(ListProjectsOut)
+def list_projects():
+    return {"projects": []}
