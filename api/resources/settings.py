@@ -24,11 +24,13 @@ def set_app_data_directory(data):
     success = True
 
     if not os.path.isdir(data["app_data_directory"]):
+        print("Directory does not exist")
         success = False
 
     try:
         session.update(os.path.join(data["app_data_directory"], "sqlite.db"))
-    except Exception:
+    except Exception as e:
+        print(e)
         success = False
 
     return {
