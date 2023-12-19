@@ -1,8 +1,10 @@
+import io
 import json
 
 import fitz
 from apiflask import APIBlueprint, Schema
 from apiflask.fields import String, Integer, List, Nested, Date
+from flask import send_file
 
 project_bp = APIBlueprint("Project", __name__, url_prefix="/project")
 
@@ -52,6 +54,23 @@ def open_pdf(params):
     page_types = list(page_types.values())
 
     return {"page_types": page_types}
+
+
+class GetPdfPageIn(Schema):
+    pdf_path = String()
+    page_number = Integer()
+
+
+@project_bp.get("/get/pdf/page")
+@project_bp.input(GetPdfPageIn, arg_name="params", location="query")
+@project_bp.output({}, content_type="image/png")
+def get_pdf_page(params):
+    doc = fitz.open(params["pdf_path"])
+    page = doc.load_page(params["page_number"] - 1)
+    zoom = 2
+    mat = fitz.Matrix(zoom, zoom)
+    image = page.get_pixmap(matrix=mat).tobytes()
+    return send_file(io.BytesIO(image), mimetype="image/png")
 
 
 class Project(Schema):

@@ -5,6 +5,8 @@ tags:
 - name: Time
 - name: Settings
 - name: Project
+servers:
+- url: http://localhost:34200/
 paths:
   /time/:
     get:
@@ -77,6 +79,34 @@ paths:
                 $ref: '#/components/schemas/HTTPError'
           description: Not found
       summary: Send File
+  /project/get/pdf/page:
+    get:
+      parameters:
+      - in: query
+        name: pdf_path
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: page_number
+        schema:
+          type: integer
+        required: false
+      responses:
+        '200':
+          content:
+            image/png:
+              schema: {}
+          description: Successful response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: Validation error
+      tags:
+      - Project
+      summary: Get Pdf Page
   /settings/app-data-directory:
     post:
       parameters: []
@@ -184,4 +214,3 @@ components:
       properties:
         valid:
           type: boolean
-
