@@ -67,7 +67,7 @@ class GetPdfPageIn(Schema):
 def get_pdf_page(params):
     doc = fitz.open(params["pdf_path"])
     page = doc.load_page(params["page_number"] - 1)
-    zoom = 2
+    zoom = 3
     mat = fitz.Matrix(zoom, zoom)
     image = page.get_pixmap(matrix=mat).tobytes()
     return send_file(io.BytesIO(image), mimetype="image/png")
