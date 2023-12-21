@@ -17,6 +17,7 @@ class PdfPageType(Schema):
     width = Integer()
     height = Integer()
     page_numbers = List(Integer())
+    type = Integer()
 
 
 class OpenPdfOut(Schema):
@@ -52,6 +53,13 @@ def open_pdf(params):
 
     # Convert the dictionary of page types to a list of page types
     page_types = list(page_types.values())
+
+    # Sort the list of page types by the number of sample page numbers in descending order
+    page_types.sort(key=lambda x: len(x["page_numbers"]), reverse=True)
+
+    # Assign a type number to each page type; starting from 0
+    for index, page_type in enumerate(page_types):
+        page_type["type"] = index
 
     return {"page_types": page_types}
 

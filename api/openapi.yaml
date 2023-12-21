@@ -5,8 +5,6 @@ tags:
 - name: Time
 - name: Settings
 - name: Project
-servers:
-- url: http://localhost:34200/
 paths:
   /time/:
     get:
@@ -197,6 +195,8 @@ components:
           type: array
           items:
             type: integer
+        type:
+          type: integer
     OpenPdfOut:
       type: object
       properties:
@@ -214,3 +214,4 @@ components:
       properties:
         valid:
           type: boolean
+
