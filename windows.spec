@@ -2,11 +2,14 @@
 
 
 a = Analysis(
-    ['api\\run.py'],
+    ['api\\app.py'],
     pathex=[],
     binaries=[],
-    datas=[('static', 'api\\static')],
-    hiddenimports=[],
+    datas=[],
+    hiddenimports=[
+        'apiflask.settings',
+        'engineio.async_drivers.threading',
+    ],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -21,7 +24,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='索引製造機',
+    name='engine',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -34,5 +37,4 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['dist\\Icon.ico'],
 )

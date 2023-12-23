@@ -1,7 +1,5 @@
 import os
-from threading import Thread
 
-import webview
 from apiflask import APIBlueprint, Schema
 from apiflask.fields import String, Boolean
 
