@@ -57,6 +57,9 @@
       }
     },
     "pdfPath": "/Users/nguylinc/Desktop/test.pdf",
-    "listPath": "/Users/nguylinc/Desktop/list.xlsx"
+    "listPath": "/Users/nguylinc/Desktop/list.xlsx",
+    "sheetName": "Sheet1",
+    "startCell": "A2",
+    "endCell": "A378"
   }
 }

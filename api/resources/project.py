@@ -1,9 +1,8 @@
 import io
-import json
 
 import fitz
 from apiflask import APIBlueprint, Schema
-from apiflask.fields import String, Integer, List, Nested, Date
+from apiflask.fields import String, Integer, List, Nested, Dict
 from flask import send_file
 
 project_bp = APIBlueprint("Project", __name__, url_prefix="/project")
@@ -81,18 +80,36 @@ def get_pdf_page(params):
     return send_file(io.BytesIO(image), mimetype="image/png")
 
 
-class Project(Schema):
-    id = String()
-    name = String()
-    created_at = Date()
-    updated_at = Date()
+class Annotation(Schema):
+    x = Integer()
+    y = Integer()
+    width = Integer()
+    height = Integer()
+    group_index = Integer()
 
 
-class ListProjectsOut(Schema):
-    projects = List(Nested(Project))
+class CreateIndexIn(Schema):
+    pdf_path = String()
+    list_path = String()
+    sheet_name = String()
+    start_cell = String()
+    end_cell = String()
+    page_types = Dict(String(), Nested(Annotation))
 
 
-@project_bp.get("/all")
-@project_bp.output(ListProjectsOut)
-def list_projects():
-    return {"projects": []}
+class CreateIndexOut(Schema):
+    page_contents = List(String())
+    word_pages = Dict(String(), List(Integer()))
+    missing_pages = List(Integer())
+
+
+@project_bp.post("/create/index")
+@project_bp.input(CreateIndexIn, arg_name="params")
+@project_bp.output(CreateIndexOut)
+def create_index(params):
+    print(params)
+    return {
+        "page_contents": [],
+        "word_pages": {},
+        "missing_pages": [],
+    }

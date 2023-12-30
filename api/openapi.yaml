@@ -19,19 +19,6 @@ paths:
       tags:
       - Time
       summary: Get
-  /project/all:
-    get:
-      parameters: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ListProjectsOut'
-          description: Successful response
-      tags:
-      - Project
-      summary: List Projects
   /project/new/pdf:
     post:
       parameters: []
@@ -105,6 +92,30 @@ paths:
       tags:
       - Project
       summary: Get Pdf Page
+  /project/create/index:
+    post:
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateIndexOut'
+          description: Successful response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: Validation error
+      tags:
+      - Project
+      summary: Create Index
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateIndexIn'
   /settings/app-data-directory:
     post:
       parameters: []
@@ -159,26 +170,6 @@ components:
       properties:
         time:
           type: string
-    Project:
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        created_at:
-          type: string
-          format: date
-        updated_at:
-          type: string
-          format: date
-    ListProjectsOut:
-      type: object
-      properties:
-        projects:
-          type: array
-          items:
-            $ref: '#/components/schemas/Project'
     OpenPdfIn:
       type: object
       properties:
@@ -204,6 +195,53 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PdfPageType'
+    Annotation:
+      type: object
+      properties:
+        x:
+          type: integer
+        y:
+          type: integer
+        width:
+          type: integer
+        height:
+          type: integer
+        group_index:
+          type: integer
+    CreateIndexIn:
+      type: object
+      properties:
+        pdf_path:
+          type: string
+        list_path:
+          type: string
+        sheet_name:
+          type: string
+        start_cell:
+          type: string
+        end_cell:
+          type: string
+        page_types:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/Annotation'
+    CreateIndexOut:
+      type: object
+      properties:
+        page_contents:
+          type: array
+          items:
+            type: string
+        word_pages:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: integer
+        missing_pages:
+          type: array
+          items:
+            type: integer
     SetAppDataDirectoryIn:
       type: object
       properties:
