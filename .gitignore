@@ -165,6 +165,7 @@ cython_debug/
 /dist
 *.pdf
 *.txt
+*.xlsx
 /poc/*.png
 .python-version
 /api/sqlite.db

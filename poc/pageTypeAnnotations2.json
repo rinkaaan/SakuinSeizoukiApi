@@ -1,0 +1,59 @@
+{
+  "pageTypeAnnotations": {
+    "0": [
+      {
+        "x": 477,
+        "y": 68,
+        "width": 363,
+        "height": 497,
+        "groupIndex": 0,
+        "color": "#a5251"
+      }, {
+        "x": 797,
+        "y": 567,
+        "width": 22,
+        "height": 18,
+        "groupIndex": 0,
+        "color": "#a5251"
+      }, {
+        "x": 55,
+        "y": 67,
+        "width": 366,
+        "height": 499,
+        "groupIndex": 1,
+        "color": "#b8bef9"
+      }, {
+        "x": 95,
+        "y": 570,
+        "width": 19,
+        "height": 16,
+        "groupIndex": 1,
+        "color": "#b8bef9"
+      }
+    ],
+    "1": [
+      {
+        "x": 82,
+        "y": 80,
+        "width": 329,
+        "height": 483,
+        "groupIndex": 0,
+        "color": "#b8bef9"
+      }, {
+        "x": 379,
+        "y": 568,
+        "width": 22,
+        "height": 19,
+        "groupIndex": 0,
+        "color": "#b8bef9"
+      }, {
+        "x": 93,
+        "y": 568,
+        "width": 22,
+        "height": 19,
+        "groupIndex": 0,
+        "color": "#b8bef9"
+      }
+    ]
+  }
+}
