@@ -116,6 +116,45 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateIndexIn'
+  /project/get/word/list:
+    get:
+      parameters:
+      - in: query
+        name: word_list_path
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: sheet_name
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: start_cell
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: end_cell
+        schema:
+          type: string
+        required: false
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetWordListOut'
+          description: Successful response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: Validation error
+      tags:
+      - Project
+      summary: Get Word List
   /settings/app-data-directory:
     post:
       parameters: []
@@ -242,6 +281,13 @@ components:
           type: array
           items:
             type: integer
+    GetWordListOut:
+      type: object
+      properties:
+        word_list:
+          type: array
+          items:
+            type: string
     SetAppDataDirectoryIn:
       type: object
       properties:

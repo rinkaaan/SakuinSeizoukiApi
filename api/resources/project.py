@@ -1,6 +1,7 @@
 import io
 
 import fitz
+import openpyxl
 from apiflask import APIBlueprint, Schema
 from apiflask.fields import String, Integer, List, Nested, Dict
 from flask import send_file
@@ -113,3 +114,43 @@ def create_index(params):
         "word_pages": {},
         "missing_pages": [],
     }
+
+
+class GetWordListIn(Schema):
+    word_list_path = String()
+    sheet_name = String()
+    start_cell = String()
+    end_cell = String()
+
+
+class GetWordListOut(Schema):
+    word_list = List(String())
+
+
+@project_bp.get("/get/word/list")
+@project_bp.input(GetWordListIn, arg_name="params", location="query")
+@project_bp.output(GetWordListOut)
+def get_word_list(params):
+    word_list_path = params["word_list_path"]
+    sheet_name = params["sheet_name"]
+    start_cell = params["start_cell"]
+    end_cell = params["end_cell"]
+
+    # Load the workbook and select the specified sheet
+    workbook = openpyxl.load_workbook(word_list_path)
+    sheet = workbook[sheet_name]
+
+    # Initialize an empty list to store cell values
+    cell_values = []
+
+    # Define the end row for reading
+    end_row = sheet.max_row if end_cell is None else sheet[end_cell].row
+
+    # Iterate through the cells in the specified column from start_cell to end_cell
+    for row in range(sheet[start_cell].row, end_row + 1):
+        cell = sheet[f"{start_cell[0]}{row}"]
+        if (cell.value is None) or (cell.value == ""):
+            continue
+        cell_values.append(str(cell.value))
+
+    return {"word_list": cell_values}
