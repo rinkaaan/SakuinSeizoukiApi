@@ -89,13 +89,17 @@ class Annotation(Schema):
     group_index = Integer()
 
 
+class PageTypeDetail(Schema):
+    annotations = List(Nested(Annotation))
+    page_numbers = List(Integer())
+
+
 class CreateIndexIn(Schema):
-    pdf_path = String()
     list_path = String()
     sheet_name = String()
     start_cell = String()
     end_cell = String()
-    page_types = Dict(String(), Nested(Annotation))
+    page_types = Dict(String(), Nested(PageTypeDetail))
 
 
 class CreateIndexOut(Schema):

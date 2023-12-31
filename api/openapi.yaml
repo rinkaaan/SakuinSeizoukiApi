@@ -247,11 +247,20 @@ components:
           type: integer
         group_index:
           type: integer
+    PageTypeDetail:
+      type: object
+      properties:
+        annotations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Annotation'
+        page_numbers:
+          type: array
+          items:
+            type: integer
     CreateIndexIn:
       type: object
       properties:
-        pdf_path:
-          type: string
         list_path:
           type: string
         sheet_name:
@@ -263,7 +272,7 @@ components:
         page_types:
           type: object
           additionalProperties:
-            $ref: '#/components/schemas/Annotation'
+            $ref: '#/components/schemas/PageTypeDetail'
     CreateIndexOut:
       type: object
       properties:
