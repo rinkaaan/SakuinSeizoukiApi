@@ -1,4 +1,5 @@
 import io
+import re
 
 import fitz
 import openpyxl
@@ -96,16 +97,22 @@ class PageTypeDetail(Schema):
 
 class CreateIndexIn(Schema):
     list_path = String()
+    pdf_path = String()
     sheet_name = String()
     start_cell = String()
     end_cell = String()
     page_types = Dict(String(), Nested(PageTypeDetail))
 
 
+class WordPages(Schema):
+    word = String()
+    pages = List(Integer())
+
+
 class CreateIndexOut(Schema):
-    page_contents = List(String())
-    word_pages = Dict(String(), List(Integer()))
+    word_pages = List(Nested(WordPages))
     missing_pages = List(Integer())
+    missing_words = List(String())
 
 
 @project_bp.post("/create/index")
@@ -113,10 +120,85 @@ class CreateIndexOut(Schema):
 @project_bp.output(CreateIndexOut)
 def create_index(params):
     print(params)
+
+    words = parse_word_list(params["list_path"], params["sheet_name"], params["start_cell"], params["end_cell"])
+    # Dictionary to store page number and content
+    page_contents = {}
+    # Dictionary to hold words and the pages they appear on
+    word_pages = {}
+    # List to store pages that were not found
+    missing_pages = []
+    # List to store words not found on any pages
+    missing_words = []
+    # Dictionary to hold filtered word_pages where all words have at least one page
+    filtered_word_pages = {}
+
+    doc = fitz.open(params["pdf_path"])
+
+    # Process each page type
+    for page_type, details in params["page_types"].items():
+        page_numbers = details["page_numbers"]
+        for page_number in page_numbers:
+            page = doc.load_page(page_number - 1)
+            current_group_index = -1
+            content = ""
+
+            for annotation in details["annotations"]:
+                x, y = annotation["x"], annotation["y"]
+                width, height = annotation["width"], annotation["height"]
+                rect = fitz.Rect(x, y, x + width, y + height)
+                chars = page.get_textbox(rect)
+
+                if annotation["group_index"] == current_group_index:
+                    is_first_annotation = False
+                else:
+                    is_first_annotation = True
+                    current_group_index = annotation["group_index"]
+                    finished_group = False
+
+                if finished_group:
+                    continue
+                if is_first_annotation:
+                    content = "".join(char for char in chars if ord(char) > 32)
+                else:
+                    actual_page_number = re.sub(r"[^0-9]", "", chars)
+                    if actual_page_number and content:
+                        page_contents[int(actual_page_number)] = content
+                        finished_group = True
+
+    # For each word, iterate through the pages and check if the word is in the page content and update the word_pages dictionary
+    # For each page, also combine contents of next page to see if word is being split across pages
+    for word in words:
+        word_pages[word] = []
+        for page_number, content in page_contents.items():
+            # For each word, iterate through the pages and check if the word is in the page content and update the word_pages dictionary
+            # For each page, also combine contents of next page to see if word is being split across pages
+
+            current_page_len = len(content)
+            if page_number + 1 in page_contents:
+                content += page_contents[page_number + 1]
+            if word in content and content.index(word) < current_page_len:
+                word_pages[word].append(page_number)
+
+    # Check if any pages are missing; set range from 1 to max of all keys in page_contents
+    for page_number in range(1, max(page_contents.keys()) + 1):
+        if page_number not in page_contents:
+            missing_pages.append(page_number)
+
+    # Remove empty arrays from word_pages and update missing_words
+    for word, pages in word_pages.items():
+        if not pages:
+            missing_words.append(word)
+        else:
+            filtered_word_pages[word] = pages
+
+    # Reshape word_pages to list of objects
+    filtered_word_pages = [{"word": word, "pages": pages} for word, pages in filtered_word_pages.items()]
+
     return {
-        "page_contents": [],
-        "word_pages": {},
-        "missing_pages": [],
+        "word_pages": filtered_word_pages,
+        "missing_pages": missing_pages,
+        "missing_words": missing_words,
     }
 
 
@@ -140,6 +222,10 @@ def get_word_list(params):
     start_cell = params["start_cell"]
     end_cell = params["end_cell"]
 
+    return {"word_list": parse_word_list(word_list_path, sheet_name, start_cell, end_cell)}
+
+
+def parse_word_list(word_list_path, sheet_name, start_cell, end_cell):
     # Load the workbook and select the specified sheet
     workbook = openpyxl.load_workbook(word_list_path)
     sheet = workbook[sheet_name]
@@ -157,4 +243,4 @@ def get_word_list(params):
             continue
         cell_values.append(str(cell.value))
 
-    return {"word_list": cell_values}
+    return cell_values

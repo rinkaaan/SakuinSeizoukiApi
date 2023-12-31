@@ -263,6 +263,8 @@ components:
       properties:
         list_path:
           type: string
+        pdf_path:
+          type: string
         sheet_name:
           type: string
         start_cell:
@@ -273,23 +275,30 @@ components:
           type: object
           additionalProperties:
             $ref: '#/components/schemas/PageTypeDetail'
+    WordPages:
+      type: object
+      properties:
+        word:
+          type: string
+        pages:
+          type: array
+          items:
+            type: integer
     CreateIndexOut:
       type: object
       properties:
-        page_contents:
+        word_pages:
           type: array
           items:
-            type: string
-        word_pages:
-          type: object
-          additionalProperties:
-            type: array
-            items:
-              type: integer
+            $ref: '#/components/schemas/WordPages'
         missing_pages:
           type: array
           items:
             type: integer
+        missing_words:
+          type: array
+          items:
+            type: string
     GetWordListOut:
       type: object
       properties:
