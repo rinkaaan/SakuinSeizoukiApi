@@ -64,6 +64,30 @@ paths:
                 $ref: '#/components/schemas/HTTPError'
           description: Not found
       summary: Send File
+  /project/get/index:
+    post:
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetIndexOut'
+          description: Successful response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: Validation error
+      tags:
+      - Project
+      summary: Get Index
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateIndexOut'
   /project/get/pdf/page:
     get:
       parameters:
@@ -234,6 +258,35 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PdfPageType'
+    WordPages:
+      type: object
+      properties:
+        word:
+          type: string
+        pages:
+          type: array
+          items:
+            type: integer
+    CreateIndexOut:
+      type: object
+      properties:
+        word_pages:
+          type: array
+          items:
+            $ref: '#/components/schemas/WordPages'
+        missing_pages:
+          type: array
+          items:
+            type: integer
+        missing_words:
+          type: array
+          items:
+            type: string
+    GetIndexOut:
+      type: object
+      properties:
+        url:
+          type: string
     Annotation:
       type: object
       properties:
@@ -275,30 +328,6 @@ components:
           type: object
           additionalProperties:
             $ref: '#/components/schemas/PageTypeDetail'
-    WordPages:
-      type: object
-      properties:
-        word:
-          type: string
-        pages:
-          type: array
-          items:
-            type: integer
-    CreateIndexOut:
-      type: object
-      properties:
-        word_pages:
-          type: array
-          items:
-            $ref: '#/components/schemas/WordPages'
-        missing_pages:
-          type: array
-          items:
-            type: integer
-        missing_words:
-          type: array
-          items:
-            type: string
     GetWordListOut:
       type: object
       properties:

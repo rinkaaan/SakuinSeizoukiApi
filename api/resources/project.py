@@ -1,4 +1,5 @@
 import io
+import os
 import re
 
 import fitz
@@ -6,6 +7,9 @@ import openpyxl
 from apiflask import APIBlueprint, Schema
 from apiflask.fields import String, Integer, List, Nested, Dict
 from flask import send_file
+from openpyxl.workbook import Workbook
+
+from nguylinc_python_utils.pyinstaller import get_bundle_dir
 
 project_bp = APIBlueprint("Project", __name__, url_prefix="/project")
 
@@ -119,8 +123,6 @@ class CreateIndexOut(Schema):
 @project_bp.input(CreateIndexIn, arg_name="params")
 @project_bp.output(CreateIndexOut)
 def create_index(params):
-    print(params)
-
     words = parse_word_list(params["list_path"], params["sheet_name"], params["start_cell"], params["end_cell"])
     # Dictionary to store page number and content
     page_contents = {}
@@ -244,3 +246,39 @@ def parse_word_list(word_list_path, sheet_name, start_cell, end_cell):
         cell_values.append(str(cell.value))
 
     return cell_values
+
+
+class GetIndexOut(Schema):
+    url = String()
+
+
+@project_bp.post("/get/index")
+@project_bp.input(CreateIndexOut, arg_name="params")
+@project_bp.output(GetIndexOut)
+def get_index(params):
+    workbook = Workbook()
+    sheet = workbook.active
+
+    sheet["A1"] = "Word"
+    sheet["B1"] = "Pages"
+
+    for index, word_pages in enumerate(params["word_pages"]):
+        sheet[f"A{index + 2}"] = word_pages["word"]
+        sheet[f"B{index + 2}"] = ", ".join(str(page) for page in word_pages["pages"])
+
+    # Adding words with no pages at end
+    for index, word in enumerate(params["missing_words"]):
+        sheet[f"A{index + 2 + len(params['word_pages'])}"] = word
+        sheet[f"B{index + 2 + len(params['word_pages'])}"] = "No pages found"
+
+    # Remove temporary file if it exists
+    try:
+        os.remove(get_bundle_dir() + "/temp/index.xlsx")
+    except FileNotFoundError:
+        pass
+
+    # Save the workbook to a temporary file
+    workbook.save(get_bundle_dir() + "/temp/index.xlsx")
+    return {
+        "url": "/temp/index.xlsx"
+    }
