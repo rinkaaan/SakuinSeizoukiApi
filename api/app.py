@@ -9,9 +9,7 @@ from flask_socketio import SocketIO
 from api.resources.project import project_bp
 from api.resources.settings import settings_bp
 from api.resources.time import time_bp
-from models.base import Base
 from nguylinc_python_utils.pyinstaller import is_pyinstaller, get_bundle_dir
-from nguylinc_python_utils.sqlalchemy import SessionManager
 
 flask_app = APIFlask(__name__, title="SakuinSeizouki API", version="0.1.0", spec_path="/openapi.yaml")
 socketio = SocketIO(flask_app, cors_allowed_origins="*")
@@ -28,9 +26,6 @@ flask_app.register_blueprint(project_bp)
 @flask_app.route("/temp/<path:path>")
 def send_file(path):
     return send_from_directory(get_bundle_dir() + "/temp", path)
-
-
-session = SessionManager(Base)
 
 
 @socketio.on("connect")
