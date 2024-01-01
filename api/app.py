@@ -11,7 +11,7 @@ from api.resources.settings import settings_bp
 from api.resources.time import time_bp
 from nguylinc_python_utils.pyinstaller import is_pyinstaller, get_bundle_dir
 
-flask_app = APIFlask(__name__, title="SakuinSeizouki API", version="0.1.0", spec_path="/openapi.yaml")
+flask_app = APIFlask(__name__, title="SakuinSeizouki API", version="0.1.0", spec_path="/openapi.yaml", docs_ui="rapidoc")
 socketio = SocketIO(flask_app, cors_allowed_origins="*")
 flask_app.config["SPEC_FORMAT"] = "yaml"
 flask_app.config["LOCAL_SPEC_PATH"] = "openapi.yaml"

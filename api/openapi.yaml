@@ -5,6 +5,8 @@ tags:
 - name: Time
 - name: Settings
 - name: Project
+servers:
+- url: http://localhost:34200/
 paths:
   /time/:
     get:
@@ -345,4 +347,3 @@ components:
       properties:
         valid:
           type: boolean
-

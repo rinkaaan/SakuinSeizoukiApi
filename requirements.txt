@@ -4,5 +4,4 @@ pyinstaller
 PyMuPDF
 python-dotenv
 flask-socketio
-SQLAlchemy
 openpyxl

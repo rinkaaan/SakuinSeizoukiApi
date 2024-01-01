@@ -8,6 +8,7 @@ from apiflask import APIBlueprint, Schema
 from apiflask.fields import String, Integer, List, Nested, Dict
 from flask import send_file
 from openpyxl.workbook import Workbook
+from openpyxl.worksheet.dimensions import DimensionHolder, ColumnDimension
 
 from nguylinc_python_utils.pyinstaller import get_bundle_dir
 
@@ -257,19 +258,52 @@ class GetIndexOut(Schema):
 @project_bp.output(GetIndexOut)
 def get_index(params):
     workbook = Workbook()
-    sheet = workbook.active
+    sheet1 = workbook.active
+    # sheet1.title = "Index"
+    sheet1.title = "索引"
 
-    sheet["A1"] = "Word"
-    sheet["B1"] = "Pages"
+    # sheet1["A1"] = "Word"
+    # sheet1["B1"] = "Pages"
+    sheet1["A1"] = "索引語"
+    sheet1["B1"] = "ページ"
+    for cell in sheet1["1:1"]:
+        cell.font = openpyxl.styles.Font(bold=True)
 
+    # Add words with pages
     for index, word_pages in enumerate(params["word_pages"]):
-        sheet[f"A{index + 2}"] = word_pages["word"]
-        sheet[f"B{index + 2}"] = ", ".join(str(page) for page in word_pages["pages"])
+        sheet1[f"A{index + 2}"] = word_pages["word"]
+        sheet1[f"B{index + 2}"] = ", ".join(str(page) for page in word_pages["pages"])
 
-    # Adding words with no pages at end
+    dim_holder = DimensionHolder(worksheet=sheet1)
+
+    # modify commented lines above to set width based on length of longest word
+    longest_word = ""
+    for word_pages in params["word_pages"]:
+        if len(word_pages["word"]) > len(longest_word):
+            longest_word = word_pages["word"]
+    dim_holder["A"] = ColumnDimension(sheet1, min=1, max=1, width=len(longest_word) * 2.1)
+
+    sheet1.column_dimensions = dim_holder
+
+    # sheet2 = workbook.create_sheet("Missing Words")
+    sheet2 = workbook.create_sheet("見つからない言葉")
+    # sheet2["A1"] = "Missing words"
+    sheet2["A1"] = "見つからない言葉"
+    for cell in sheet2["1:1"]:
+        cell.font = openpyxl.styles.Font(bold=True)
+    # Add missing words below header
     for index, word in enumerate(params["missing_words"]):
-        sheet[f"A{index + 2 + len(params['word_pages'])}"] = word
-        sheet[f"B{index + 2 + len(params['word_pages'])}"] = "No pages found"
+        sheet2[f"A{index + 2}"] = word
+
+    # sheet3 = workbook.create_sheet("Missing Pages")
+    sheet3 = workbook.create_sheet("見つからないページ")
+    # sheet3["A1"] = "Missing pages"
+    sheet3["A1"] = "見つからないページ"
+    for cell in sheet3["1:1"]:
+        cell.font = openpyxl.styles.Font(bold=True)
+    # Add missing pages
+    for index, page in enumerate(params["missing_pages"]):
+        sheet3[f"A{index + 2}"] = page
 
     # Remove temporary file if it exists
     try:
