@@ -201,7 +201,8 @@ def get_index(params):
         pass
 
     # Save the workbook to a temporary file
-    workbook.save(get_bundle_dir() + "/temp/index.xlsx")
+    # workbook.save(get_bundle_dir() + "/temp/index.xlsx")
+    workbook.save(get_bundle_dir() + "/temp/索引.xlsx")
     return {
-        "url": "/temp/index.xlsx"
+        "url": "/temp/索引.xlsx"
     }
