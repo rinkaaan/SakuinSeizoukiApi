@@ -66,7 +66,7 @@ class GetPageImageIn(Schema):
 @pdf_bp.get("/page-image")
 @pdf_bp.input(GetPageImageIn, arg_name="params", location="query")
 @pdf_bp.output({}, content_type="image/png")
-def get_pdf_page(params):
+def get_page_image(params):
     doc = fitz.open(params["pdf_path"])
     page = doc.load_page(params["page_number"] - 1)
     zoom = 1

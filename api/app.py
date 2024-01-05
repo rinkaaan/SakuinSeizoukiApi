@@ -6,8 +6,8 @@ from flask import send_from_directory
 from flask_cors import CORS
 from flask_socketio import SocketIO
 
+from api.resources.index import index_bp
 from api.resources.pdf import pdf_bp
-from api.resources.project import project_bp
 from api.resources.word_list import word_list_bp
 from nguylinc_python_utils.pyinstaller import is_pyinstaller, get_bundle_dir
 
@@ -19,13 +19,13 @@ flask_app.config["LOCAL_SPEC_PATH"] = "openapi.yaml"
 flask_app.config["SYNC_LOCAL_SPEC"] = True
 CORS(flask_app, supports_credentials=False)
 
-flask_app.register_blueprint(project_bp)
 flask_app.register_blueprint(pdf_bp)
 flask_app.register_blueprint(word_list_bp)
+flask_app.register_blueprint(index_bp)
 
 
 @flask_app.route("/temp/<path:path>")
-def send_file(path):
+def get_file(path):
     return send_from_directory(get_bundle_dir() + "/temp", path)
 
 

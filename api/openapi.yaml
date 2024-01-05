@@ -2,10 +2,36 @@ info:
   title: SakuinSeizouki API
   version: 0.1.0
 tags:
-- name: Project
 - name: Pdf
 - name: Word List
+- name: Index
+servers:
+- url: http://localhost:34200/
 paths:
+  /index/get:
+    post:
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetIndexOut'
+          description: Successful response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: Validation error
+      tags:
+      - Index
+      summary: Get Index
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateIndexOut'
   /word-list/:
     get:
       parameters:
@@ -45,6 +71,30 @@ paths:
       tags:
       - Word List
       summary: Get Word List
+  /index/create:
+    post:
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateIndexOut'
+          description: Successful response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: Validation error
+      tags:
+      - Index
+      summary: Create Index
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateIndexIn'
   /pdf/page-types:
     get:
       parameters:
@@ -96,7 +146,7 @@ paths:
           description: Validation error
       tags:
       - Pdf
-      summary: Get Pdf Page
+      summary: Get Page Image
   /temp/{path}:
     get:
       parameters:
@@ -117,55 +167,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/HTTPError'
           description: Not found
-      summary: Send File
-  /project/get/index:
-    post:
-      parameters: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetIndexOut'
-          description: Successful response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-          description: Validation error
-      tags:
-      - Project
-      summary: Get Index
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateIndexOut'
-  /project/create/index:
-    post:
-      parameters: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CreateIndexOut'
-          description: Successful response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-          description: Validation error
-      tags:
-      - Project
-      summary: Create Index
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateIndexIn'
+      summary: Get File
 openapi: 3.0.3
 components:
   schemas:
@@ -191,33 +193,6 @@ components:
         message:
           type: string
       type: object
-    GetWordListOut:
-      type: object
-      properties:
-        word_list:
-          type: array
-          items:
-            type: string
-    PageType:
-      type: object
-      properties:
-        width:
-          type: integer
-        height:
-          type: integer
-        page_numbers:
-          type: array
-          items:
-            type: integer
-        type:
-          type: integer
-    GetPageTypesOut:
-      type: object
-      properties:
-        page_types:
-          type: array
-          items:
-            $ref: '#/components/schemas/PageType'
     WordPages:
       type: object
       properties:
@@ -247,6 +222,13 @@ components:
       properties:
         url:
           type: string
+    GetWordListOut:
+      type: object
+      properties:
+        word_list:
+          type: array
+          items:
+            type: string
     Annotation:
       type: object
       properties:
@@ -288,4 +270,23 @@ components:
           type: object
           additionalProperties:
             $ref: '#/components/schemas/PageTypeDetail'
-
+    PageType:
+      type: object
+      properties:
+        width:
+          type: integer
+        height:
+          type: integer
+        page_numbers:
+          type: array
+          items:
+            type: integer
+        type:
+          type: integer
+    GetPageTypesOut:
+      type: object
+      properties:
+        page_types:
+          type: array
+          items:
+            $ref: '#/components/schemas/PageType'

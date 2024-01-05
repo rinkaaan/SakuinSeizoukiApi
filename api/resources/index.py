@@ -4,15 +4,16 @@ import re
 import fitz
 import openpyxl
 from apiflask import APIBlueprint, Schema
-from apiflask.fields import String, Integer, List, Nested, Dict
-from openpyxl.workbook import Workbook
+from marshmallow.fields import String, List, Dict, Nested, Integer
+from openpyxl import Workbook
 from openpyxl.worksheet.dimensions import DimensionHolder, ColumnDimension
 
 from api.resources.word_list import parse_word_list
+
 from api.schemas.main import PageTypeDetail, WordPages
 from nguylinc_python_utils.pyinstaller import get_bundle_dir
 
-project_bp = APIBlueprint("Project", __name__, url_prefix="/project")
+index_bp = APIBlueprint("Index", __name__, url_prefix="/index")
 
 
 class CreateIndexIn(Schema):
@@ -30,9 +31,9 @@ class CreateIndexOut(Schema):
     missing_words = List(String())
 
 
-@project_bp.post("/create/index")
-@project_bp.input(CreateIndexIn, arg_name="params")
-@project_bp.output(CreateIndexOut)
+@index_bp.post("/create")
+@index_bp.input(CreateIndexIn, arg_name="params")
+@index_bp.output(CreateIndexOut)
 def create_index(params):
     words = parse_word_list(params["list_path"], params["sheet_name"], params["start_cell"], params["end_cell"])
     # Dictionary to store page number and content
@@ -119,9 +120,9 @@ class GetIndexOut(Schema):
     url = String()
 
 
-@project_bp.post("/get/index")
-@project_bp.input(CreateIndexOut, arg_name="params")
-@project_bp.output(GetIndexOut)
+@index_bp.post("/get")
+@index_bp.input(CreateIndexOut, arg_name="params")
+@index_bp.output(GetIndexOut)
 def get_index(params):
     workbook = Workbook()
     sheet1 = workbook.active
