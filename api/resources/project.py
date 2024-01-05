@@ -1,4 +1,3 @@
-import io
 import os
 import re
 
@@ -6,98 +5,13 @@ import fitz
 import openpyxl
 from apiflask import APIBlueprint, Schema
 from apiflask.fields import String, Integer, List, Nested, Dict
-from flask import send_file
 from openpyxl.workbook import Workbook
 from openpyxl.worksheet.dimensions import DimensionHolder, ColumnDimension
 
+from api.schemas.project import PageTypeDetail, WordPages
 from nguylinc_python_utils.pyinstaller import get_bundle_dir
 
 project_bp = APIBlueprint("Project", __name__, url_prefix="/project")
-
-
-class OpenPdfIn(Schema):
-    pdf_path = String()
-
-
-class PdfPageType(Schema):
-    width = Integer()
-    height = Integer()
-    page_numbers = List(Integer())
-    type = Integer()
-
-
-class OpenPdfOut(Schema):
-    page_types = List(Nested(PdfPageType))
-
-
-@project_bp.post("/new/pdf")
-@project_bp.input(OpenPdfIn, arg_name="params")
-@project_bp.output(OpenPdfOut)
-def open_pdf(params):
-    doc = fitz.open(params["pdf_path"])
-
-    # Initialize an empty dictionary to store page types and their sample page numbers
-    page_types = {}
-
-    # Loop through all pages in the document
-    for page_number, page in enumerate(doc):
-        # Get the current page's width and height; rounded up
-        page_width = int(round(page.mediabox_size[0]))
-        page_height = int(round(page.mediabox_size[1]))
-
-        # Check if the current page size exists in the `page_types` dictionary
-        if (page_width, page_height) not in page_types:
-            # Create a new entry for the current page size
-            page_types[(page_width, page_height)] = {
-                "width": page_width,
-                "height": page_height,
-                "page_numbers": [],
-            }
-
-        # Append the current page number to the sample page numbers for the current page size
-        page_types[(page_width, page_height)]["page_numbers"].append(page_number + 1)
-
-    # Convert the dictionary of page types to a list of page types
-    page_types = list(page_types.values())
-
-    # Sort the list of page types by the number of sample page numbers in descending order
-    page_types.sort(key=lambda x: len(x["page_numbers"]), reverse=True)
-
-    # Assign a type number to each page type; starting from 0
-    for index, page_type in enumerate(page_types):
-        page_type["type"] = index
-
-    return {"page_types": page_types}
-
-
-class GetPdfPageIn(Schema):
-    pdf_path = String()
-    page_number = Integer()
-
-
-@project_bp.get("/get/pdf/page")
-@project_bp.input(GetPdfPageIn, arg_name="params", location="query")
-@project_bp.output({}, content_type="image/png")
-def get_pdf_page(params):
-    doc = fitz.open(params["pdf_path"])
-    page = doc.load_page(params["page_number"] - 1)
-    zoom = 1
-    mat = fitz.Matrix(zoom, zoom)
-    image = page.get_pixmap(matrix=mat).tobytes()
-    return send_file(io.BytesIO(image), mimetype="image/png")
-
-
-class Annotation(Schema):
-    x = Integer()
-    y = Integer()
-    width = Integer()
-    height = Integer()
-    group_index = Integer()
-
-
-class PageTypeDetail(Schema):
-    annotations = List(Nested(Annotation))
-    page_numbers = List(Integer())
 
 
 class CreateIndexIn(Schema):
@@ -107,11 +21,6 @@ class CreateIndexIn(Schema):
     start_cell = String()
     end_cell = String()
     page_types = Dict(String(), Nested(PageTypeDetail))
-
-
-class WordPages(Schema):
-    word = String()
-    pages = List(Integer())
 
 
 class CreateIndexOut(Schema):
@@ -274,16 +183,16 @@ def get_index(params):
         sheet1[f"A{index + 2}"] = word_pages["word"]
         sheet1[f"B{index + 2}"] = ", ".join(str(page) for page in word_pages["pages"])
 
-    dim_holder = DimensionHolder(worksheet=sheet1)
-
-    # modify commented lines above to set width based on length of longest word
+    # Resize column A to fit the longest word
+    dim_holder_1 = DimensionHolder(worksheet=sheet1)
     longest_word = ""
     for word_pages in params["word_pages"]:
         if len(word_pages["word"]) > len(longest_word):
             longest_word = word_pages["word"]
-    dim_holder["A"] = ColumnDimension(sheet1, min=1, max=1, width=len(longest_word) * 2.1)
-
-    sheet1.column_dimensions = dim_holder
+    if len("索引語") > len(longest_word):
+        longest_word = "索引語"
+    dim_holder_1["A"] = ColumnDimension(sheet1, min=1, max=1, width=len(longest_word) * 2.1)
+    sheet1.column_dimensions = dim_holder_1
 
     # sheet2 = workbook.create_sheet("Missing Words")
     sheet2 = workbook.create_sheet("見つからない言葉")
@@ -295,6 +204,17 @@ def get_index(params):
     for index, word in enumerate(params["missing_words"]):
         sheet2[f"A{index + 2}"] = word
 
+    # Resize column A to fit the longest word
+    dim_holder_2 = DimensionHolder(worksheet=sheet2)
+    longest_word = ""
+    for word in params["missing_words"]:
+        if len(word) > len(longest_word):
+            longest_word = word
+    if len("見つからない言葉") > len(longest_word):
+        longest_word = "見つからない言葉"
+    dim_holder_2["A"] = ColumnDimension(sheet2, min=1, max=1, width=len(longest_word) * 2.1)
+    sheet2.column_dimensions = dim_holder_2
+
     # sheet3 = workbook.create_sheet("Missing Pages")
     sheet3 = workbook.create_sheet("見つからないページ")
     # sheet3["A1"] = "Missing pages"
@@ -304,6 +224,17 @@ def get_index(params):
     # Add missing pages
     for index, page in enumerate(params["missing_pages"]):
         sheet3[f"A{index + 2}"] = page
+
+    # Resize column A to fit the longest page number
+    dim_holder_3 = DimensionHolder(worksheet=sheet3)
+    longest_page_number = ""
+    for page in params["missing_pages"]:
+        if len(str(page)) > len(longest_page_number):
+            longest_page_number = str(page)
+    if (len("見つからないページ") > len(longest_page_number)):
+        longest_page_number = "見つからないページ"
+    dim_holder_3["A"] = ColumnDimension(sheet3, min=1, max=1, width=len(longest_page_number) * 2.1)
+    sheet3.column_dimensions = dim_holder_3
 
     # Remove temporary file if it exists
     try:

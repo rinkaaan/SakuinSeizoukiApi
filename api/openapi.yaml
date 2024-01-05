@@ -2,34 +2,23 @@ info:
   title: SakuinSeizouki API
   version: 0.1.0
 tags:
-- name: Time
-- name: Settings
 - name: Project
-servers:
-- url: http://localhost:34200/
+- name: Pdf
 paths:
-  /time/:
+  /pdf/page-types:
     get:
-      parameters: []
+      parameters:
+      - in: query
+        name: pdf_path
+        schema:
+          type: string
+        required: false
       responses:
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TimeOut'
-          description: Successful response
-      tags:
-      - Time
-      summary: Get
-  /project/new/pdf:
-    post:
-      parameters: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OpenPdfOut'
+                $ref: '#/components/schemas/GetPageTypesOut'
           description: Successful response
         '422':
           content:
@@ -38,13 +27,36 @@ paths:
                 $ref: '#/components/schemas/ValidationError'
           description: Validation error
       tags:
-      - Project
+      - Pdf
       summary: Open Pdf
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/OpenPdfIn'
+  /pdf/page-image:
+    get:
+      parameters:
+      - in: query
+        name: pdf_path
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: page_number
+        schema:
+          type: integer
+        required: false
+      responses:
+        '200':
+          content:
+            image/png:
+              schema: {}
+          description: Successful response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: Validation error
+      tags:
+      - Pdf
+      summary: Get Pdf Page
   /temp/{path}:
     get:
       parameters:
@@ -90,34 +102,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateIndexOut'
-  /project/get/pdf/page:
-    get:
-      parameters:
-      - in: query
-        name: pdf_path
-        schema:
-          type: string
-        required: false
-      - in: query
-        name: page_number
-        schema:
-          type: integer
-        required: false
-      responses:
-        '200':
-          content:
-            image/png:
-              schema: {}
-          description: Successful response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-          description: Validation error
-      tags:
-      - Project
-      summary: Get Pdf Page
   /project/create/index:
     post:
       parameters: []
@@ -181,30 +165,6 @@ paths:
       tags:
       - Project
       summary: Get Word List
-  /settings/app-data-directory:
-    post:
-      parameters: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SetAppDataDirectoryOut'
-          description: Successful response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-          description: Validation error
-      tags:
-      - Settings
-      summary: Set App Data Directory
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SetAppDataDirectoryIn'
 openapi: 3.0.3
 components:
   schemas:
@@ -230,16 +190,6 @@ components:
         message:
           type: string
       type: object
-    TimeOut:
-      type: object
-      properties:
-        time:
-          type: string
-    OpenPdfIn:
-      type: object
-      properties:
-        pdf_path:
-          type: string
     PdfPageType:
       type: object
       properties:
@@ -253,7 +203,7 @@ components:
             type: integer
         type:
           type: integer
-    OpenPdfOut:
+    GetPageTypesOut:
       type: object
       properties:
         page_types:
@@ -337,13 +287,4 @@ components:
           type: array
           items:
             type: string
-    SetAppDataDirectoryIn:
-      type: object
-      properties:
-        app_data_directory:
-          type: string
-    SetAppDataDirectoryOut:
-      type: object
-      properties:
-        valid:
-          type: boolean
+
