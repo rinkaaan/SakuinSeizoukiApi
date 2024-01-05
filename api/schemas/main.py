@@ -2,7 +2,7 @@ from apiflask import Schema
 from marshmallow.fields import Integer, List, Nested, String
 
 
-class PdfPageType(Schema):
+class PageType(Schema):
     width = Integer()
     height = Integer()
     page_numbers = List(Integer())

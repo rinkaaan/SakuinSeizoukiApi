@@ -5,7 +5,7 @@ from apiflask import APIBlueprint, Schema
 from flask import send_file
 from marshmallow.fields import String, List, Nested, Integer
 
-from api.schemas.project import PdfPageType
+from api.schemas.main import PageType
 
 pdf_bp = APIBlueprint("Pdf", __name__, url_prefix="/pdf")
 
@@ -15,7 +15,7 @@ class GetPageTypesIn(Schema):
 
 
 class GetPageTypesOut(Schema):
-    page_types = List(Nested(PdfPageType))
+    page_types = List(Nested(PageType))
 
 
 @pdf_bp.get("/page-types")

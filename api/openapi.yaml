@@ -4,7 +4,47 @@ info:
 tags:
 - name: Project
 - name: Pdf
+- name: Word List
 paths:
+  /word-list/:
+    get:
+      parameters:
+      - in: query
+        name: word_list_path
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: sheet_name
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: start_cell
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: end_cell
+        schema:
+          type: string
+        required: false
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetWordListOut'
+          description: Successful response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: Validation error
+      tags:
+      - Word List
+      summary: Get Word List
   /pdf/page-types:
     get:
       parameters:
@@ -126,45 +166,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateIndexIn'
-  /project/get/word/list:
-    get:
-      parameters:
-      - in: query
-        name: word_list_path
-        schema:
-          type: string
-        required: false
-      - in: query
-        name: sheet_name
-        schema:
-          type: string
-        required: false
-      - in: query
-        name: start_cell
-        schema:
-          type: string
-        required: false
-      - in: query
-        name: end_cell
-        schema:
-          type: string
-        required: false
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetWordListOut'
-          description: Successful response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-          description: Validation error
-      tags:
-      - Project
-      summary: Get Word List
 openapi: 3.0.3
 components:
   schemas:
@@ -190,7 +191,14 @@ components:
         message:
           type: string
       type: object
-    PdfPageType:
+    GetWordListOut:
+      type: object
+      properties:
+        word_list:
+          type: array
+          items:
+            type: string
+    PageType:
       type: object
       properties:
         width:
@@ -209,7 +217,7 @@ components:
         page_types:
           type: array
           items:
-            $ref: '#/components/schemas/PdfPageType'
+            $ref: '#/components/schemas/PageType'
     WordPages:
       type: object
       properties:
@@ -280,11 +288,4 @@ components:
           type: object
           additionalProperties:
             $ref: '#/components/schemas/PageTypeDetail'
-    GetWordListOut:
-      type: object
-      properties:
-        word_list:
-          type: array
-          items:
-            type: string
 
