@@ -9,6 +9,7 @@ from flask_socketio import SocketIO
 from api.resources.index import index_bp
 from api.resources.pdf import pdf_bp
 from api.resources.word_list import word_list_bp
+from api.resources.temp import temp_bp
 from nguylinc_python_utils.pyinstaller import is_pyinstaller, get_bundle_dir
 
 # flask_app = APIFlask(__name__, title="SakuinSeizouki API", version="0.1.0", spec_path="/openapi.yaml", docs_ui="elements")
@@ -22,6 +23,7 @@ CORS(flask_app, supports_credentials=False)
 flask_app.register_blueprint(pdf_bp)
 flask_app.register_blueprint(word_list_bp)
 flask_app.register_blueprint(index_bp)
+flask_app.register_blueprint(temp_bp)
 
 
 @flask_app.route("/temp/<path:path>")

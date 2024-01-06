@@ -5,31 +5,8 @@ tags:
 - name: Pdf
 - name: Word List
 - name: Index
+- name: Temp
 paths:
-  /index/get:
-    post:
-      parameters: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetIndexOut'
-          description: Successful response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-          description: Validation error
-      tags:
-      - Index
-      summary: Get Index
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateIndexOut'
   /word-list/:
     get:
       parameters:
@@ -145,6 +122,34 @@ paths:
       tags:
       - Pdf
       summary: Get Page Image
+  /temp/save-file:
+    post:
+      parameters:
+      - in: query
+        name: path
+        schema:
+          type: string
+        required: false
+      - in: query
+        name: save_path
+        schema:
+          type: string
+        required: false
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: Validation error
+      tags:
+      - Temp
+      summary: Save File
   /temp/{path}:
     get:
       parameters:
@@ -191,35 +196,6 @@ components:
         message:
           type: string
       type: object
-    WordPages:
-      type: object
-      properties:
-        word:
-          type: string
-        pages:
-          type: array
-          items:
-            type: integer
-    CreateIndexOut:
-      type: object
-      properties:
-        word_pages:
-          type: array
-          items:
-            $ref: '#/components/schemas/WordPages'
-        missing_pages:
-          type: array
-          items:
-            type: integer
-        missing_words:
-          type: array
-          items:
-            type: string
-    GetIndexOut:
-      type: object
-      properties:
-        url:
-          type: string
     GetWordListOut:
       type: object
       properties:
@@ -268,6 +244,30 @@ components:
           type: object
           additionalProperties:
             $ref: '#/components/schemas/PageTypeDetail'
+    WordPages:
+      type: object
+      properties:
+        word:
+          type: string
+        pages:
+          type: array
+          items:
+            type: integer
+    CreateIndexOut:
+      type: object
+      properties:
+        word_pages:
+          type: array
+          items:
+            $ref: '#/components/schemas/WordPages'
+        missing_pages:
+          type: array
+          items:
+            type: integer
+        missing_words:
+          type: array
+          items:
+            type: string
     PageType:
       type: object
       properties:

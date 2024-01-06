@@ -109,6 +109,8 @@ def create_index(params):
     # Reshape word_pages to list of objects
     filtered_word_pages = [{"word": word, "pages": pages} for word, pages in filtered_word_pages.items()]
 
+    save_index(filtered_word_pages, missing_pages, missing_words)
+
     return {
         "word_pages": filtered_word_pages,
         "missing_pages": missing_pages,
@@ -116,14 +118,7 @@ def create_index(params):
     }
 
 
-class GetIndexOut(Schema):
-    url = String()
-
-
-@index_bp.post("/get")
-@index_bp.input(CreateIndexOut, arg_name="params")
-@index_bp.output(GetIndexOut)
-def get_index(params):
+def save_index(word_pages, missing_pages, missing_words):
     workbook = Workbook()
     sheet1 = workbook.active
     # sheet1.title = "Index"
@@ -137,16 +132,16 @@ def get_index(params):
         cell.font = openpyxl.styles.Font(bold=True)
 
     # Add words with pages
-    for index, word_pages in enumerate(params["word_pages"]):
+    for index, word_pages in enumerate(word_pages):
         sheet1[f"A{index + 2}"] = word_pages["word"]
         sheet1[f"B{index + 2}"] = ", ".join(str(page) for page in word_pages["pages"])
 
     # Resize column A to fit the longest word
     dim_holder_1 = DimensionHolder(worksheet=sheet1)
     longest_word = ""
-    for word_pages in params["word_pages"]:
-        if len(word_pages["word"]) > len(longest_word):
-            longest_word = word_pages["word"]
+    for word in word_pages:
+        if len(word) > len(longest_word):
+            longest_word = word
     if len("索引語") > len(longest_word):
         longest_word = "索引語"
     dim_holder_1["A"] = ColumnDimension(sheet1, min=1, max=1, width=len(longest_word) * 2.1)
@@ -159,13 +154,13 @@ def get_index(params):
     for cell in sheet2["1:1"]:
         cell.font = openpyxl.styles.Font(bold=True)
     # Add missing words below header
-    for index, word in enumerate(params["missing_words"]):
+    for index, word in enumerate(missing_words):
         sheet2[f"A{index + 2}"] = word
 
     # Resize column A to fit the longest word
     dim_holder_2 = DimensionHolder(worksheet=sheet2)
     longest_word = ""
-    for word in params["missing_words"]:
+    for word in missing_words:
         if len(word) > len(longest_word):
             longest_word = word
     if len("見つからない言葉") > len(longest_word):
@@ -180,13 +175,13 @@ def get_index(params):
     for cell in sheet3["1:1"]:
         cell.font = openpyxl.styles.Font(bold=True)
     # Add missing pages
-    for index, page in enumerate(params["missing_pages"]):
+    for index, page in enumerate(missing_pages):
         sheet3[f"A{index + 2}"] = page
 
     # Resize column A to fit the longest page number
     dim_holder_3 = DimensionHolder(worksheet=sheet3)
     longest_page_number = ""
-    for page in params["missing_pages"]:
+    for page in missing_pages:
         if len(str(page)) > len(longest_page_number):
             longest_page_number = str(page)
     if (len("見つからないページ") > len(longest_page_number)):
@@ -203,6 +198,3 @@ def get_index(params):
     # Save the workbook to a temporary file
     # workbook.save(get_bundle_dir() + "/temp/index.xlsx")
     workbook.save(get_bundle_dir() + "/temp/索引.xlsx")
-    return {
-        "url": "/temp/索引.xlsx"
-    }
